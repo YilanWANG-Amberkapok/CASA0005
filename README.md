@@ -2,9 +2,11 @@
 
 ## Submission
 
-On clicking the exam link a new repository has been created for you in the exam classroom. You should now clone this repository into a new RStudio project then commit and push to GitHub as usual. 
+On clicking the exam link a new repository has been created for you in the exam classroom. You should now clone this repository into a new RStudio project then **knit, commit and push** to GitHub as usual. 
 
 You must knit your final `exam_response.Rmd` to `html` and ensure you push to GitHub before the deadline.
+
+GitHub takes a snapshot of your **local git** repository at the deadline so **knit, commit and push often**, as you should do in all spatial data science projects. The deadline is based on your last commit, but we expect the repository to be pushed to GitHub very soon after. 
 
 ## Before you begin: 
 
@@ -37,6 +39,8 @@ Marks are awarded as per the marking scheme. It's important to note there is no 
 * Create at least one graphical output and at least one mapped output.
 
 ## Tips:
+
+* You are able to propose a variation of the original question (e.g. selecting a specific year of data to analyse) based on appropriate reasoning, but this must be clearly stated. 
 
 * Expectations of the assignment are relative to the time allocated. Do not waste time trying to propose / develop the most advanced or innovative form of analysis.
 
@@ -75,7 +79,7 @@ Vegetation has a large impact on local temperature,  with heat being the leading
 * Landsat surface reflectance image
 * Los Angeles census tracts (outline of which is the city of Los Angeles)
 
-## The impacts of redlining on social equity  
+## Graffiti mitigation 
 
 In 2004 the city of San Francisco stopped cleaning graffiti on private property passing the responsibility to property owners who must act within 30 days or face a $500 fine. A local group of business owners are getting frustrated by the cost of continually removing graffiti. They have appointed you to identify factors that might geographically influence graffiti occurrence so they can present a case to the city for pro-active measures.
 
