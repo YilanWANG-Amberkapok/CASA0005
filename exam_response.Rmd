@@ -10,10 +10,10 @@ output: html_document
 
 I, [**insert your name**], confirm that the work presented in this assessment is my own. Where information has been derived from other sources, I confirm that this has been indicated in the work.
 
-[**insert your name here**]
-
 date: `r format(Sys.time(), '%d %B, %Y')`
 
 # Start your response here
 
 ## Initial project scope
+
+

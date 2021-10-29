@@ -2,11 +2,9 @@
 
 ## Submission
 
-On clicking the exam link a new repository has been created for you in the exam classroom. You should now clone this repository into a new RStudio project then **knit, commit and push** to GitHub as usual. 
+On clicking the exam link a new repository has been created for you in the exam classroom. You should now clone this repository into a new RStudio project then **commit and push** to GitHub as usual. 
 
-You must knit your final `exam_response.Rmd` to `html` and ensure you push to GitHub before the deadline.
-
-GitHub takes a snapshot of your **local git** repository at the deadline so **knit, commit and push often**, as you should do in all spatial data science projects. The deadline is based on your last commit, but we expect the repository to be pushed to GitHub very soon after. 
+GitHub takes a snapshot of your **local git** repository at the deadline so **commit and push often**, as you should do in all spatial data science projects. The deadline is based on your last commit, but we expect the repository to be pushed to GitHub very soon after. 
 
 ## Before you begin: 
 
@@ -16,7 +14,7 @@ GitHub takes a snapshot of your **local git** repository at the deadline so **kn
 
 ## Task
 
-You have four hours to complete this open book exam. You must select and undertake **only one** of the research questions below. Data for each question has been provided in the relevant folder and you are free to source additional data for extension analysis but everything you need is provided.
+You have four hours to complete this open book exam. You must select and undertake **only one** of the research questions below. Links to the data for each question have been provided and you are free to source additional data for extension analysis, but everything you need is provided.
 
 * You must write your response in the `exam_response.Rmd`, under the originality declaration.
 
@@ -26,7 +24,7 @@ You have four hours to complete this open book exam. You must select and underta
 
 * You can use RStudio visual markdown editor if you wish.
 
-* If you copy section of code from an online source please provide a relevant link or acknowledgment.
+* If you copy a section of code from an online source please provide a relevant link or acknowledgment.
 
 Marks are awarded as per the marking scheme. It's important to note there is no 'right' answer, even if your findings are inconclusive or not as expected, you are awarded marks for how you approach the problem.  
 
@@ -37,6 +35,8 @@ Marks are awarded as per the marking scheme. It's important to note there is no 
 * Produce a well commented and fully explained RMarkdown document that attempts to answer the research question.
 
 * Create at least one graphical output and at least one mapped output.
+
+* Critically reflect on the results you have produced. 
 
 ## Tips:
 
@@ -54,16 +54,24 @@ Marks are awarded as per the marking scheme. It's important to note there is no 
 
 * In most questions some administrative boundary data has been provided, use this to assist guiding recommendations and outputs.
 
+* Provide critical commentary about the data you are using and the analysis you are undertaking throughout.
+
+* Plan your time, we suggest 1 hour for data exploration, 2-3 hours for analysis, 1 hour for visualisations, 1 hour for interpretation and reflection. 
+
 # Practice Question
 
 ## New York Evictions
 
-New York City wish to conduct a study that aims to prevent people being evicted by understand possible related factors. They have appointed you as a contractor to determine if there was a spatial pattern in evictions in 2020.  
+New York City wish to conduct a study that aims to prevent people being evicted through understand possible related factors.You have been enlisted as a consultant and tasked to conduct an analysis of their data from 2020.
+
+You should use appropriate data processing and analysis methods to produce an overview report which summarises the patterns revealed in the data in this year. It is expected that at least some of the methods you use will relate to the spatial dimensions of the data.
+
+Your report should include a brief introduction including relevant contextual information at the beginning and a critical review of your findings at the end. You must include at least one map. 
 
 ### Data
 
-* List of evictions
-* New York City community districts 
+* List of evictions - https://data.cityofnewyork.us/City-Government/Evictions/6z8x-wfk4
+* New York City community districts - https://data.cityofnewyork.us/City-Government/Community-Districts/yfnk-k7r4
 
 ## The impacts of redlining on social equity  
 
@@ -71,17 +79,27 @@ Starting in the 1930s the American Home Owners' Loan Corporation (HOLC) was task
 
 The Civil Rights Act of 1968 (the Fair Housing Act) made it unlawful to discriminate housing or financing in this manner. However, the redlining legacy has left severe social equity issues across cities, such as access to outdoor space, clean air and trees. 
 
-Vegetation has a large impact on local temperature,  with heat being the leading cause of weather related deaths in the USA. You have been tasked to establish to what extent current temperature differs across the HOLC "graded neighbourhoods" in Los Angeles.  
+Vegetation has a large impact on local temperature, with heat being the leading cause of weather related deaths in the USA. As a result you have been enlisted as a consultant and tasked to conduct an analysis exploring temperature differences across the HOLC "graded neighbourhoods" in Los Angeles.
+
+You should use appropriate data processing and analysis methods to produce an overview report which summarises the patterns revealed in the data. It is expected that at least some of the methods you use will relate to the spatial dimensions of the data.
+
+Your report should include a brief introduction including relevant contextual information at the beginning and a critical review of your findings at the end. You must include at least one map.
 
 ### Data
 
-* Los Angeles redlining shapefile
-* Landsat surface reflectance image
-* Los Angeles census tracts (outline of which is the city of Los Angeles)
+* Los Angeles redlining shapefile - https://dsl.richmond.edu/panorama/redlining/#loc=3/41.245/-105.469&text=downloads
+* May 2021 Landsat 8 image (Landsat Collection 2 Level-1) covering the study area with minimal could cover - https://earthexplorer.usgs.gov/
+* Los Angeles census tracts (outline of which is the city of Los Angeles) - https://data.lacounty.gov/Geospatial/Census-Tracts-2010/ay2y-b9rg
 
 ## Graffiti mitigation 
 
-In 2004 the city of San Francisco stopped cleaning graffiti on private property passing the responsibility to property owners who must act within 30 days or face a $500 fine. A local group of business owners are getting frustrated by the cost of continually removing graffiti. They have appointed you to identify factors that might geographically influence graffiti occurrence so they can present a case to the city for pro-active measures.
+In 2004 the city of San Francisco stopped cleaning graffiti on private property passing the responsibility to property owners who must act within 30 days or face a $500 fine. A local group of business owners are getting frustrated by the cost of continually removing graffiti. 
+
+The local business owners have enlisted you as a consultant and tasked you to conduct an analysis of possible contirubting factors to graffiti occurrence that they can present a case to city legislators for pro-active measures. 
+
+You should use appropriate data processing and analysis methods to produce an overview report which summarises the patterns revealed in the data. It is expected that at least some of the methods you use will relate to the spatial dimensions of the data.
+
+Your report should include a brief introduction including relevant contextual information at the beginning and a critical review of your findings at the end. You must include at least one map.
 
 ### Data
 
@@ -92,5 +110,5 @@ In 2004 the city of San Francisco stopped cleaning graffiti on private property 
 * Household income in dollars (census tract)
 * Poverty status (census tract)
 * Private Health insurance coverage (census tract)
-* Census tract spatial data
-* Graffiti points
+* Census tract spatial data - https://data.sfgov.org/Geographic-Locations-and-Boundaries/Census-2010-Tracts-for-San-Francisco/rarb-5ahf
+* Graffiti points - https://data.sfgov.org/City-Infrastructure/Graffiti/vg6y-3pcr 
