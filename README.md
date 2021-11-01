@@ -95,7 +95,7 @@ Your report should include a brief introduction including relevant contextual in
 
 In 2004 the city of San Francisco stopped cleaning graffiti on private property passing the responsibility to property owners who must act within 30 days or face a $500 fine. A local group of business owners are getting frustrated by the cost of continually removing graffiti. 
 
-The local business owners have enlisted you as a consultant and tasked you to conduct an analysis of possible contirubting factors to graffiti occurrence that they can present a case to city legislators for pro-active measures. 
+The local business owners have enlisted you as a consultant and tasked you to conduct an analysis of possible contributing factors to graffiti occurrence so they can present a case to city legislators for pro-active measures. 
 
 You should use appropriate data processing and analysis methods to produce an overview report which summarises the patterns revealed in the data. It is expected that at least some of the methods you use will relate to the spatial dimensions of the data.
 
@@ -103,12 +103,18 @@ Your report should include a brief introduction including relevant contextual in
 
 ### Data
 
-* Household data (census tract)
-* Education data (census tract)
-* Household income data (numbers on households in each category) (census tract)
-* Population age data (census tract)
-* Household income in dollars (census tract)
-* Poverty status (census tract)
-* Private Health insurance coverage (census tract)
+* American Community Household Survey: https://data.census.gov/cedsci/advanced?g=0400000US06%241400000
+
+Go to advanced search > Geography > Tract > California > All Census Tracts within California > search > all tables > then you can filter on a keyword and download tables.
+
+From the American Community Household Survey you might consider using:
+  * Household data (census tract)
+  * Education data (census tract)
+  * Household income data (numbers on households in each category) (census tract)
+  * Population age data (census tract)
+  * Household income in dollars (census tract)
+  * Poverty status (census tract)
+  * Private Health insurance coverage (census tract)
+  
 * Census tract spatial data - https://data.sfgov.org/Geographic-Locations-and-Boundaries/Census-2010-Tracts-for-San-Francisco/rarb-5ahf
 * Graffiti points - https://data.sfgov.org/City-Infrastructure/Graffiti/vg6y-3pcr 
