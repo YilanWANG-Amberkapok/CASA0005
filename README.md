@@ -30,7 +30,11 @@ Marks are awarded as per the marking scheme. It's important to note there is no 
 
 ## Within your work you must:
 
-* Provide an initial project scope in bullet point form, detailing the process and data wangling and analysis you intend to undertake, prior to starting the analysis. 
+* Provide an initial project scope in bullet point form, detailing the process and data wangling and analysis you intend to undertake, prior to starting the analysis. Your project scope should include:
+  * Relevant contextual information which situates the analysis you will be undertaking
+  * A brief evaluation of your main research dataset(s) as well as an assessment of any data processing tasks that will be required or additional data that might be required to complete your analysis
+  * A brief statement of your proposed analysis. This may include research questions or hypotheses you identify as relevant. 
+  * You may also wish to identify constraints (around the data you have been instructed to analyse) or obvious omissions from the set task that could limit what will be produced in this short project. These could relate to spatial or temporal limitations in the dataset or what you decide is reasonable to analyse or anything else that is relevant. 
 
 * Produce a well commented and fully explained RMarkdown document that attempts to answer the research question.
 
