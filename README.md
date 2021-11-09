@@ -14,7 +14,7 @@ GitHub takes a snapshot of your **local git** repository at the deadline so **co
 
 ## Task
 
-You have four hours to complete this open book exam. You must select and undertake **only one** of the research questions below. Links to the data for each question have been provided and you are free to source additional data for extension analysis, but everything you need is provided.
+You have six hours to complete this open book exam. You must select and undertake **only one** of the research questions below. Links to the data for each question have been provided and you are free to source additional data for extension analysis, but everything you need is provided.
 
 * You must write your response in the `exam_response.Rmd`, under the originality declaration.
 
@@ -32,10 +32,10 @@ Marks are awarded as per the marking scheme. It's important to note there is no 
 
 * Provide an initial project scope in bullet point form. Your project scope should include:
 
-    * If you intend to propose a variation of the original question (e.g. selecting a specific year of data to analyse), however this must be based on appropriate reasoning and clearly stated.
+    * If you intend to propose a variation of the original question (e.g. selecting a specific year of data to analyse), this must be based on appropriate reasoning and clearly stated.
   * A brief evaluation of your main research dataset(s) as well as an assessment of any data processing tasks that will be required or additional data that might be required to complete your analysis.
-  * A brief explanation of data wangling and analysis you intend to undertake, prior to starting the analysis. This may include research questions or hypotheses you identify as relevant. 
-  * You may also wish to identify constraints (around the data you have been instructed to analyse) or obvious omissions from the set task that could limit what will be produced in this short project. These could relate to spatial or temporal limitations in the dataset, what you decide is reasonable to analyse or anything else that is relevant. 
+  * A brief explanation of the data wangling and analysis you intend to undertake, prior to starting the analysis. This may include research questions or hypotheses you identify as relevant. 
+  * You may also wish to identify any constraints (around the data you have been instructed to analyse) or obvious omissions from the set task that could limit what will be produced in this short project. These could relate to spatial or temporal limitations in the dataset, what you decide is reasonable to analyse or anything else that is relevant. 
 
 * Produce a well commented and fully explained RMarkdown document that attempts to answer the research question.
 
@@ -45,9 +45,7 @@ Marks are awarded as per the marking scheme. It's important to note there is no 
 
 ## Tips:
 
-* Expectations of the assignment are relative to the time allocated. Do not waste time trying to propose / develop the most advanced or innovative form of analysis.
-
-* Do the basis well. 
+* In the time you have, prioritise good solid analysis over innovative analysis that uses advanced techniques.
 
 * Structure your RMarkdown document with titles and subtitles. 
 
@@ -59,7 +57,7 @@ Marks are awarded as per the marking scheme. It's important to note there is no 
 
 * Provide critical commentary about the data you are using and the analysis you are undertaking throughout.
 
-* Plan your time, we suggest 1 hour for data exploration, 2-3 hours for analysis, 1 hour for visualisations, 1 hour for interpretation and reflection. 
+* Plan your time. We suggest 1 hour for data exploration, 2-3 hours for analysis, 1 hour for visualisations, 1 hour for interpretation and reflection. 
 
 # Practice Question
 
