@@ -86,9 +86,9 @@ Your report should include a brief introduction including relevant contextual in
 
 ### Data
 
-* American Community Household Survey: https://data.census.gov/cedsci/advanced?g=0400000US06%241400000
+* American Community Household Survey: https://data.census.gov/cedsci/advanced
 
-Go to advanced search > Geography > Tract > California > All Census Tracts within California > search > all tables > then you can filter on a keyword and download tables.
+Under Find a Filter > Geography > Tract > California > All Census Tracts within California > tables > then you can filter on a keyword and download tables.
 
 From the American Community Household Survey you might consider using:
   * Household data (census tract)
