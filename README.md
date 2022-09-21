@@ -74,24 +74,6 @@ Your report should include a brief introduction including relevant contextual in
 * List of evictions - https://data.cityofnewyork.us/City-Government/Evictions/6z8x-wfk4
 * New York City community districts - https://data.cityofnewyork.us/City-Government/Community-Districts/yfnk-k7r4
 
-## The impacts of redlining on social equity  
-
-Starting in the 1930s the American Home Owners' Loan Corporation (HOLC) was tasked with refinancing mortgages on properties to prevent missed payments. To do this the HOLC assessed the "credit-worthiness" of neighbourhoods, dividing them largely on race into grades between A, considered the "best", and D considered "hazardous", drawn around in red, hence the term "redlining". Other services such as healthcare and infrastructure investments were decided in similar way. 
-
-The Civil Rights Act of 1968 (the Fair Housing Act) made it unlawful to discriminate housing or financing in this manner. However, the redlining legacy has left severe social equity issues across cities, such as access to outdoor space, clean air and trees. 
-
-Vegetation has a large impact on local temperature, with heat being the leading cause of weather related deaths in the USA. As a result you have been enlisted as a consultant and tasked to conduct an analysis exploring temperature differences across the HOLC "graded neighbourhoods" in Los Angeles.
-
-You should use appropriate data processing and analysis methods to produce an overview report which summarises the patterns revealed in the data. It is expected that at least some of the methods you use will relate to the spatial dimensions of the data.
-
-Your report should include a brief introduction including relevant contextual information at the beginning and a critical review of your findings at the end. You must include at least one map.
-
-### Data
-
-* Los Angeles redlining shapefile - https://dsl.richmond.edu/panorama/redlining/#loc=3/41.245/-105.469&text=downloads
-* May 2021 Landsat 8 image (Landsat Collection 2 Level-1) covering the study area with minimal could cover - https://earthexplorer.usgs.gov/
-* Los Angeles census tracts (outline of which is the city of Los Angeles) - https://data.lacounty.gov/Geospatial/Census-Tracts-2010/ay2y-b9rg
-
 ## Graffiti mitigation 
 
 In 2004 the city of San Francisco stopped cleaning graffiti on private property passing the responsibility to property owners who must act within 30 days or face a $500 fine. A local group of business owners are getting frustrated by the cost of continually removing graffiti. 
