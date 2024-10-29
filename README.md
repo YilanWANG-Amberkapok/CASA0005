@@ -37,6 +37,10 @@ Marks are awarded as per the marking scheme. It's important to note there is no 
   * A brief explanation of the data wangling and analysis you intend to undertake, prior to starting the analysis. This may include research questions or hypotheses you identify as relevant. 
   * You may also wish to identify any constraints (around the data you have been instructed to analyse) or obvious omissions from the set task that could limit what will be produced in this short project. These could relate to spatial or temporal limitations in the dataset, what you decide is reasonable to analyse or anything else that is relevant. 
 
+* **Commit and push once per hour** during the final exam.
+
+* Provide all data, unless it exceeds the GitHub upload limit, in which case a URL must be given.
+
 * Produce a well commented and fully explained RMarkdown document that attempts to answer the research question.
 
 * Create at least one graphical output and at least one mapped output.
