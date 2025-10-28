@@ -4,7 +4,7 @@
 
 On clicking the exam link a new repository has been created for you in the exam classroom. You should now clone this repository into a new RStudio project then **commit and push** to GitHub as usual. 
 
-GitHub takes a snapshot of your **local git** repository at the deadline so **commit and push often**, as you should do in all spatial data science projects. The deadline is based on your last commit, but we expect the repository to be pushed to GitHub very soon after. 
+GitHub takes a snapshot of your **local git** repository at the deadline so **commit and push often (e.g. once per hour)**, as you should do in all spatial data science projects. The deadline is based on your last commit, but we expect the repository to be pushed to GitHub very soon after. 
 
 ## Before you begin: 
 
@@ -18,11 +18,9 @@ You have six hours to complete this open book exam. You must select and undertak
 
 * You must write your response in the `exam_response.Rmd`, under the originality declaration.
 
-* You may use any resource to assist you but the work must be your own and you are required to sign a originality statement within the exam. 
+* You may use any resource to assist you but the work must be your own and you are required to sign a originality statement within the exam. Clearly acknowledge and state if/where AI has been used. 
 
 * Questions about the exam must be asked on the open Slack GIS channel. 
-
-* You can use RStudio visual markdown editor if you wish.
 
 * If you copy a section of code from an online source please provide a relevant link or acknowledgment.
 
@@ -30,16 +28,19 @@ Marks are awarded as per the marking scheme. It's important to note there is no 
 
 ## Within your work you must:
 
-* Provide an initial project scope in bullet point form. Your project scope should include:
+* Provide an initial project scope in bullet point form. Your project scope **should** include:
 
-    * If you intend to propose a variation of the original question (e.g. selecting a specific year of data to analyse), this must be based on appropriate reasoning and clearly stated.
-  * A brief evaluation of your main research dataset(s) as well as an assessment of any data processing tasks that will be required or additional data that might be required to complete your analysis.
-  * A brief explanation of the data wangling and analysis you intend to undertake, prior to starting the analysis. This may include research questions or hypotheses you identify as relevant. 
-  * You may also wish to identify any constraints (around the data you have been instructed to analyse) or obvious omissions from the set task that could limit what will be produced in this short project. These could relate to spatial or temporal limitations in the dataset, what you decide is reasonable to analyse or anything else that is relevant. 
+  * If you intend to propose a variation of the original question (e.g. selecting a specific year of data to analyse), this must be based on appropriate reasoning and clearly stated.
+  * A research question and/or hypothesis.
+  * A brief evaluation of your main research dataset(s) 
+  * An explanation of additional data that you might have sourced for your analysis (it is not a requirement to source additional data).
+  * A brief explanation of the data wrangling you intend to undertake. 
+  * A justified plan for the spatial data analysis that will be required.
+  * You may also wish to identify any constraints around the data you have been instructed to analyse or obvious omissions from the set task that could limit what will be produced in this short project. These could relate to spatial or temporal limitations in the dataset, what you decide is reasonable to analyse or anything else that is relevant. 
 
-* **Commit and push once per hour** during the final exam.
+* **Commit and push regularly (e.g. once per hour)** during the final exam.
 
-* Provide all data, unless it exceeds the GitHub upload limit, in which case a URL must be given.
+* Provide any data your have sourced, unless it exceeds the GitHub upload limit, in which case a URL must be given.
 
 * Produce a well commented and fully explained RMarkdown document that attempts to answer the research question.
 
