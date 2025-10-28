@@ -31,6 +31,7 @@ Marks are awarded as per the marking scheme. It's important to note there is no 
 * Provide an initial project scope in bullet point form. Your project scope **should** include:
 
   * If you intend to propose a variation of the original question (e.g. selecting a specific year of data to analyse), this must be based on appropriate reasoning and clearly stated.
+  * A breif background to the topic.
   * A research question and/or hypothesis.
   * A brief evaluation of your main research dataset(s) 
   * An explanation of additional data that you might have sourced for your analysis (it is not a requirement to source additional data).
