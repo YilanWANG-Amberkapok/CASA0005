@@ -31,11 +31,11 @@ Marks are awarded as per the marking scheme. It's important to note there is no 
 * Provide an initial project scope in bullet point form. Your project scope **should** include:
 
   * If you intend to propose a variation of the original question (e.g. selecting a specific year of data to analyse), this must be based on appropriate reasoning and clearly stated.
-  * A breif background to the topic.
+  * A brief background to the topic.
   * A research question and/or hypothesis.
-  * A brief evaluation of your main research dataset(s) 
+  * An evaluation of your main research dataset(s).
   * An explanation of additional data that you might have sourced for your analysis (it is not a requirement to source additional data).
-  * A brief explanation of the data wrangling you intend to undertake. 
+  * An explanation of the data wrangling you intend to undertake. 
   * A justified plan for the spatial data analysis that will be required.
   * You may also wish to identify any constraints around the data you have been instructed to analyse or obvious omissions from the set task that could limit what will be produced in this short project. These could relate to spatial or temporal limitations in the dataset, what you decide is reasonable to analyse or anything else that is relevant. 
 
