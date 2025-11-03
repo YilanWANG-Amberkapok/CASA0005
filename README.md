@@ -95,18 +95,19 @@ Your report should include a brief introduction including relevant contextual in
 
 ### Data
 
+* Census tract spatial data - https://www.census.gov/cgi-bin/geo/shapefiles/
+
+* Graffiti points - https://data.sfgov.org/City-Infrastructure/Graffiti/vg6y-3pcr 
+
 * American Community Household Survey: https://data.census.gov/cedsci/advanced
 
 Under Geographies: Census Tract > California > All Census Tracts within California > tables > then you can filter on a keyword and download tables.
 
 From the American Community Household Survey you might consider using:
-  * Household data (census tract)
-  * Education data (census tract)
-  * Household income data (numbers on households in each category) (census tract)
-  * Population age data (census tract)
-  * Household income in dollars (census tract)
-  * Poverty status (census tract)
-  * Private Health insurance coverage (census tract)
-  
-* Census tract spatial data - https://www.census.gov/cgi-bin/geo/shapefiles/
-* Graffiti points - https://data.sfgov.org/City-Infrastructure/Graffiti/vg6y-3pcr 
+    * Household data (census tract)
+    * Education data (census tract)
+    * Household income data (numbers on households in each category) (census tract)
+    * Population age data (census tract)
+    * Household income in dollars (census tract)
+    * Poverty status (census tract)
+    * Private Health insurance coverage (census tract)
