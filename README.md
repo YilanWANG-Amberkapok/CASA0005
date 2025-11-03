@@ -81,7 +81,7 @@ Your report should include a brief introduction including relevant contextual in
 ### Data
 
 * List of evictions - https://data.cityofnewyork.us/City-Government/Evictions/6z8x-wfk4
-* New York City community districts - https://data.cityofnewyork.us/City-Government/Community-Districts/yfnk-k7r4
+* New York City community districts - https://www.nyc.gov/content/planning/pages/resources/datasets/community-districts
 
 ## Graffiti mitigation 
 
@@ -97,7 +97,7 @@ Your report should include a brief introduction including relevant contextual in
 
 * American Community Household Survey: https://data.census.gov/cedsci/advanced
 
-Under Find a Filter > Geography > Tract > California > All Census Tracts within California > tables > then you can filter on a keyword and download tables.
+Under Geographies: Census Tract > California > All Census Tracts within California > tables > then you can filter on a keyword and download tables.
 
 From the American Community Household Survey you might consider using:
   * Household data (census tract)
@@ -108,5 +108,5 @@ From the American Community Household Survey you might consider using:
   * Poverty status (census tract)
   * Private Health insurance coverage (census tract)
   
-* Census tract spatial data - https://data.sfgov.org/Geographic-Locations-and-Boundaries/Census-2010-Tracts-for-San-Francisco/rarb-5ahf
+* Census tract spatial data - https://www.census.gov/cgi-bin/geo/shapefiles/
 * Graffiti points - https://data.sfgov.org/City-Infrastructure/Graffiti/vg6y-3pcr 
