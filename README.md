@@ -104,10 +104,10 @@ Your report should include a brief introduction including relevant contextual in
 Under Geographies: Census Tract > California > All Census Tracts within California > tables > then you can filter on a keyword and download tables.
 
 From the American Community Household Survey you might consider using:
-    * Household data (census tract)
-    * Education data (census tract)
-    * Household income data (numbers on households in each category) (census tract)
-    * Population age data (census tract)
-    * Household income in dollars (census tract)
-    * Poverty status (census tract)
-    * Private Health insurance coverage (census tract)
+    * Age and Sex (census tract)
+    * Educational Attainment (census tract)
+    * Households and Families (census tract)
+    * Income in the Past 12 Months (numbers on households in each category) (census tract)
+    * Poverty Status in the Past 12 Months (census tract)
+    * Selected Characteristics of Health Insurance (census tract)
+  
