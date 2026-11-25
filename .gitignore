@@ -3,3 +3,14 @@
 .RData
 .Ruserdata
 
+.DS_Store
+*.html
+data/source_data_evictions_2020/pluto_20v1_csv.zip
+data/source_data_evictions_2020/g20195ny.txt
+data/source_data_evictions_2020/g20195ny.csv
+data/source_data_evictions_2020/20195ny*
+data/source_data_evictions_2020/tiger2019_extract/
+data/source_data_evictions_2020/tl_2019_36_tract/
+
+# Large source archive (available from the URL in the data README)
+data/source_data_evictions_2020/pluto_20v1_csv.zip

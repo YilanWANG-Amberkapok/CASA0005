@@ -1,10 +1,596 @@
 ---
-title: "student number: 26212840"
+title: "New York City Evictions in Early 2020: Rates, Clustering and Rent Burden by Community District"
+author: "student number: 26212840"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    df_print: paged
 ---
-## Originality declaration  
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 8, fig.height = 6, dpi = 120)
+options(scipen = 999)   # print counts as plain numbers, not 1.86e+04
+fmt_p <- function(p) if (p < 0.001) "p < 0.001" else paste0("p = ", round(p, 3))   # for p-values in the text
+```
+
+## Originality declaration
 
 I, Yilan WANG, confirm that the work presented in this assessment is my own. Where information has been derived from other sources, I confirm that this has been indicated in the work.
 
-## Initial project scope
+### Statement on the use of generative AI
+
+I used Claude (Anthropic) as an assistant throughout this project. This statement sets out which parts of the work are mine, what the AI contributed, and how I checked its contributions.
+
+**Work I did**
+
+- I chose the issue of eviction in New York; I reviewed the background and attempted to analyse the data to confirm the direction of the analysis and my hypotheses, and decided to conduct the analysis at the neighbourhood and district levels, as I am interested in urban regeneration and resident participation in local planning.
+- Wrote the draft, including the background, the research questions, the decision to exclude Joint Interest Areas, and the argument that executed evictions omit informal, market-driven displacement. That argument comes from my own research on the urban regeneration of Nantou Ancient Town in Shenzhen.
+- Organised all datasets in the project folder (NYC evictions 2019–2020, the community district boundaries, ACS 2015–2019 tract tables and 2019 TIGER tract boundaries), and documented their sources and known issues in `data/source_data_evictions_2020/README_数据来源.md`.
+- I tried to diversify the data processing methods included in CASA0007 as much as possible and to produce corresponding plots. Having reviewed the first complete draft, we ultimately concluded that the following methods were capable of explaining and substantiating the analytical findings: weekly time series, rate distribution plots, global and local Moran’s I indices, and ordinary least squares (OLS) combined with a spatial error model.
+- The organised data was analysed and interpreted; drawing on previous research experience from the Nantou Ancient Town project, the limitations of the data analysis and interpretation were examined, and a critical reflection was provided.
+
+**What the AI contributed**
+
+- *For research design.* Using my Nantou research experience as a starting point, we discussed whether the analysis approach was feasible. The AI pointed out that marshal enforcement was suspended from mid-March 2020, which led me to define the 1 January–15 March 2020 study window. It recommended renter households as the denominator instead of raw counts, suggested k-nearest-neighbour weights because water separates the boroughs, and explained why Ripley's K and DBSCAN would be misleading here, which helped me to refine the way I handle data.
+- *For data.* AI refined and tested most of the R code in Sections 2–4: data cleaning and deduplication, spatial joining, aggregation from statistical districts to electoral constituencies, charts and maps, Moran’s I and the LISA test, as well as regression models.It also improved its readability and comments, and ran it in its own R environment to confirm that the document executes without errors.
+- *For text and formatting.* AI polished up some imprecise wording in my draft; it also helped to structure the R Markdown document and adjust the formatting.
+- *For fact-checking.* AI used web search to check contextual facts: the date enforcement was suspended, and the 2019 and early-2020 eviction totals.
+
+**How I checked the AI-assisted work**
+
+- Compared the cleaned record counts with the figures published by the NYC Office of Civil Justice (3,028 vs 3,035 residential evictions in 2020).
+- Key numbers in Sections 2–6 are inline R code, so they update automatically from the data. The remaining figures (including those in the project scope, which was written before the analysis) and the interpretive claims were checked by me against the printed output.
 
 
+---
+
+# 1. Project scope
+
+- **Proposed variation of the question**
+  - The task asks for an analysis of 2020. In practice, 2020 contains only about ten weeks of ordinary enforcement: the state court system suspended pending eviction orders from 16 March 2020, and only nine residential evictions were executed for the rest of the year (all in November and December).
+  - The **study window is therefore 1 January to 15 March 2020**, which contains more than 99% of 2020's residential evictions. The nine later records are reported but not analysed spatially.
+  - 2019 data are used in only two places: to draw the 2019 line in the weekly graph, and for a one-line check that the 2020 district pattern matches a normal year.
+
+- **Background**
+  - Evictions are a cause, not just a symptom, of housing instability and homelessness. In New York City, a marshal can only execute an eviction after a Housing Court judgment and warrant. The dataset therefore records the *final stage* of a long legal process (filing → judgment → warrant → execution) (Desmond, 2016).
+  - The Office of Civil Justice reports 3,035 residential evictions executed by marshals in 2020, compared with 16,996 in 2019 (NYC Office of Civil Justice, 2021). The fall reflects the COVID-19 suspension, not an easing of housing insecurity. Executions were already declining before the pandemic, partly because of the City's phased roll-out of free legal representation for tenants in Housing Court ("Right to Counsel").
+  - My wider interest is in urban renewal and civic participation. Community districts are the territories of New York's **community boards**, the formal venue for residents' participation in land-use review. Reporting results at this scale makes them directly usable by the bodies that represent residents.
+
+- **Research question and hypothesis**
+  - *Research question:* In early 2020, how were marshal-executed residential evictions per 1,000 renter households distributed across New York City's community districts? Were high-rate districts spatially clustered? And how were rates related to rent burden?
+  - *Hypothesis:* eviction rates vary strongly between districts and are positively spatially autocorrelated. Districts where a larger share of renters pay 30% or more of their income in rent have higher eviction rates, even after accounting for poverty and spatial dependence.
+
+- **Research datasets and evaluation**
+  - **Evictions** (NYC Open Data `6z8x-wfk4`, Department of Investigation). One row per executed warrant, with executed date, residential/commercial flag, eviction vs legal possession, borough, ZIP, coordinates, community board, census tract and building identifiers. Strengths: complete administrative coverage of executed marshal evictions. Weaknesses:
+    - It records **executions only**. It contains no filings, no case type (non-payment vs holdover), and no informal displacement such as buyouts, harassment or "voluntary" moves under pressure. It therefore undercounts displacement, and does so *unevenly* across places.
+    - It contains **exact duplicate rows**: 97 among residential records in 2019–2020, including 36 in 2020. After removing them, 2020 has 3,028 residential records, close to OCJ's 3,035. The remaining gap is likely due to later data revisions.
+    - 205 residential records in 2020 have no coordinates and cannot be mapped. This is about 7% of the year's records.
+    - A row is a warrant, not a household. Several rows can refer to the same building.
+  - **Community districts** (DCP *nycd* release 20D, clipped to shoreline, EPSG:2263, US feet). There are 71 features: 59 community districts and 12 Joint Interest Areas (parks, airports). JIAs are excluded as analytical units because they have almost no resident renters.
+
+- **Additional data sourced** (in `data/source_data_evictions_2020/`; see `README_数据来源.md`)
+  - **ACS 2015–2019 five-year estimates** (tables B25003, B25070, B17001, B03002) for 2,167 census tracts, with **2019 TIGER tract boundaries**. These provide the **denominator** (renter households) and the explanatory variables (rent burden ≥30%, poverty rate, % non-Hispanic Black). The 2015–19 vintage describes the pre-pandemic population exposed in early 2020. All values are survey estimates with margins of error.
+  - **How tracts are combined into community districts.** ACS data are published for census tracts, which are smaller than community districts but do not fit inside them exactly. Each tract is assigned to the **single community district it overlaps most by area**, and the tract *counts* (renter households, rent-burdened households, people in poverty and so on) are **added up** within each district. Percentages are then calculated from those district totals, never by averaging tract percentages, so large and small tracts are weighted correctly. Section 3.3 reports how many tracts and residents this process leaves out.
+
+- **Planned data wrangling**
+  - Remove exact duplicate rows. Keep residential records. Parse `executed_date` and define the study window. Drop personal fields (address, apartment, court and marshal identifiers) immediately after deduplication.
+  - Convert records with coordinates to `sf` (EPSG:4326 → EPSG:2263). Assign them to community districts with a point-in-polygon join, and check the join against the community-board field reported in the data.
+  - Aggregate ACS tracts to districts as described above.
+  - Count evictions per district and divide by renter households to get **evictions per 1,000 renter households**.
+
+- **Planned analysis and justification**
+  1. *Weekly time series, 2019 vs 2020:* to show the policy break and justify the study window.
+  2. *Choropleth map of district rates:* to describe the spatial distribution.
+  3. *Global Moran's I and Local Moran's I (LISA):* to test whether high-rate districts cluster, and where. Queen contiguity leaves Manhattan, Staten Island and the Rockaways disconnected by water, so **k = 4 nearest neighbours** is the main weights matrix. Queen weights are reported as a check. Local tests are corrected for multiple testing with the false-discovery-rate (FDR) method.
+  4. *OLS regression → Moran's I of residuals:* to measure the association between rent burden and eviction rates while controlling for poverty and racial composition, then to check whether the residuals are spatially independent. If they are not, a **spatial error model** is fitted (see Section 4.4 for why).
+  - **Why Ripley's K and DBSCAN are not used.** Both test or detect clustering of *points* against a uniform background. Housing in New York is extremely unevenly distributed, so evictions will always look "clustered" under complete spatial randomness, and DBSCAN would mostly rediscover dense residential neighbourhoods. A meaningful point-pattern test would need a null model built from the distribution of rental housing units. That requires building-level housing data and is beyond the scope of this short project. The research question is about **rates for populations at risk**, so area-based methods with a renter denominator answer it more directly.
+
+- **Constraints and limitations**
+  - A ten-week, winter-only window. Its representativeness is checked against 2019 rather than assumed.
+  - The data capture only the formal, final stage of displacement. Renewal-driven displacement may run mainly through non-court channels, so low rates cannot be read as "no displacement".
+  - With 59 districts, statistical power is limited, local tests are many, and results depend on the spatial unit (the modifiable areal unit problem, MAUP). Tract-level modelling is not used because about 3,000 events across 2,167 tracts gives mostly zeros.
+  - All results are associations at district level (ecological), not causal effects or individual risks.
+
+---
+
+# 2. Data loading and exploration
+
+## 2.1 Packages
+
+The analysis uses `sf` for vector data, `spdep` and `spatialreg` for spatial weights, autocorrelation and spatial regression, and the tidyverse packages for wrangling and plotting. The chunk installs anything that is missing.
+
+```{r packages}
+pkgs <- c("sf", "dplyr", "readr", "tidyr", "lubridate", "ggplot2",
+          "ggspatial", "scales", "spdep", "spatialreg", "knitr")
+missing_pkgs <- pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing_pkgs) > 0) install.packages(missing_pkgs)
+
+library(sf)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+library(scales)
+library(spdep)
+library(spatialreg)
+
+data_dir <- "data/source_data_evictions_2020"
+```
+
+## 2.2 Eviction records
+
+The full download (2019–2020, residential and commercial) is read with every column as text, so that identifiers such as ZIP codes keep their leading zeros and full precision.
+
+```{r load-evictions}
+ev_raw <- read_csv(file.path(data_dir, "evictions_2019_2020.csv"),
+                   col_types = cols(.default = col_character()))
+
+dim(ev_raw)
+names(ev_raw)
+```
+
+```{r explore-evictions}
+# How many rows are exact duplicates of another row?
+n_exact_dup <- sum(duplicated(ev_raw))
+
+ev_raw %>%
+  mutate(year = substr(executed_date, 1, 4)) %>%
+  count(year, residential_commercial_ind) %>%
+  pivot_wider(names_from = residential_commercial_ind, values_from = n)
+
+ev_raw %>% count(eviction_possession)
+ev_raw %>% count(ejectment)
+```
+
+The raw file has `r nrow(ev_raw)` rows, of which `r n_exact_dup` are exact duplicates. Commercial records belong to a separate legal and economic process, so they are excluded. "Possession" (the tenant is removed, their property stays in the landlord's custody) is far more common than "Eviction". Both mean the household lost its home, so both are kept. Ejectments are very rare.
+
+## 2.3 Boundary and census data
+
+```{r load-boundaries}
+cd_all <- st_read("data/nycd_20d/nycd.shp", quiet = TRUE) %>%
+  mutate(jia = BoroCD %% 100 > 18)   # JIAs carry district numbers above 18
+
+st_crs(cd_all)$epsg   # 2263: NY State Plane Long Island, US feet
+table(cd_all$jia)
+
+tracts <- st_read(file.path(data_dir, "nyc_tracts_2019.gpkg"), quiet = TRUE)
+acs    <- read_csv(file.path(data_dir, "acs_2015_2019_nyc_tracts.csv"),
+                   col_types = cols(GEOID = col_character()))
+
+c(tracts = nrow(tracts), acs_rows = nrow(acs),
+  acs_geoid_match = sum(acs$GEOID %in% tracts$GEOID))
+```
+
+The boundary file contains 59 community districts and 12 JIAs, already in EPSG:2263, so all distances and areas below are in **US feet**. Every ACS row matches a tract boundary.
+
+---
+
+# 3. Data wrangling
+
+## 3.1 Cleaning and defining the study window
+
+Exact duplicates are removed first. Personal fields are then dropped, so that no address or apartment information reaches any table or map. The executed date defines the study window.
+
+```{r clean-evictions}
+ev <- ev_raw %>%
+  distinct() %>%                                         # remove exact duplicates
+  filter(residential_commercial_ind == "Residential") %>%
+  mutate(executed_date   = as_date(ymd_hms(executed_date)),
+         year            = year(executed_date),
+         latitude        = as.numeric(latitude),
+         longitude       = as.numeric(longitude),
+         community_board = as.integer(community_board),
+         in_window = executed_date >= as_date("2020-01-01") &
+                     executed_date <= as_date("2020-03-15")) %>%
+  select(-court_index_number, -docket_number, -eviction_address,
+         -eviction_apt_num, -marshal_first_name, -marshal_last_name)
+
+table(ev$year)
+
+# Records in 2020 that fall after the moratorium began
+ev %>% filter(year == 2020, !in_window) %>%
+  count(month = month(executed_date, label = TRUE))
+
+# Missing locations by year
+ev %>% group_by(year) %>%
+  summarise(records = n(), no_coords = sum(is.na(latitude)))
+```
+
+```{r window-numbers, include = FALSE}
+n20_total  <- sum(ev$year == 2020)
+n20_window <- sum(ev$in_window)
+n20_nocoord <- sum(ev$year == 2020 & is.na(ev$latitude))   # 2020 records that cannot be mapped
+```
+
+After deduplication, 2020 has **`r n20_total`** residential evictions, and **`r n20_window`** (`r percent(n20_window / n20_total, 0.1)`) fall in the 1 January–15 March window.
+
+## 3.2 Points to community districts
+
+```{r points-to-cd}
+ev_sf <- ev %>%
+  filter(!is.na(latitude), !is.na(longitude)) %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, remove = FALSE) %>%
+  st_transform(2263) %>%
+  st_join(cd_all %>% select(BoroCD, jia))
+
+# Check the spatial join against the community board reported in the data
+boro_code <- c(MANHATTAN = 1, BRONX = 2, BROOKLYN = 3, QUEENS = 4, `STATEN ISLAND` = 5)
+ev_sf <- ev_sf %>% mutate(cd_reported = boro_code[borough] * 100 + community_board)
+
+c(points = nrow(ev_sf),
+  unmatched = sum(is.na(ev_sf$BoroCD)),
+  in_JIA = sum(ev_sf$jia, na.rm = TRUE),
+  agreement = round(mean(ev_sf$cd_reported == ev_sf$BoroCD, na.rm = TRUE), 4))
+
+join_agree <- mean(ev_sf$cd_reported == ev_sf$BoroCD, na.rm = TRUE)
+disagree <- ev_sf %>% st_drop_geometry() %>%
+  filter(cd_reported != BoroCD) %>%
+  count(cd_reported, joined_to = BoroCD, sort = TRUE)
+disagree
+n_mh <- sum(disagree$n[disagree$cd_reported == 108 & disagree$joined_to == 208])
+```
+
+Every located record falls inside a residential community district (none in a JIA), and the join agrees with the reported community board for `r percent(join_agree, 0.01)` of records. Of the `r sum(disagree$n)` disagreements, `r n_mh` are records reported as Manhattan district 8 that fall in Bronx district 8. This is consistent with Marble Hill, which is legally part of Manhattan but sits on the Bronx mainland. The spatial join is used from here on because it matches the boundaries being mapped.
+
+## 3.3 ACS: from tracts to community districts
+
+This step builds the denominator and the explanatory variables, so it is done in three explicit stages.
+
+**Stage 1: assign each tract to one district.** Tracts are intersected with the 59 residential districts (JIAs left out, so that no residents are assigned to a park or airport). For each tract the overlapping area with each district is measured, and the tract goes to the district with the **largest overlap**.
+
+```{r tract-assignment}
+cd <- cd_all %>% filter(!jia)   # the 59 analytical units
+
+tract_to_cd <- st_intersection(tracts %>% select(GEOID), cd %>% select(BoroCD)) %>%
+  mutate(overlap = as.numeric(st_area(.))) %>%   # overlap area in square feet
+  st_drop_geometry() %>%
+  group_by(GEOID) %>%
+  slice_max(overlap, n = 1, with_ties = FALSE) %>% # keep the largest piece only
+  ungroup() %>%
+  select(GEOID, BoroCD)
+
+# Which tracts were not assigned, and how many people live in them?
+unassigned <- acs %>% anti_join(tract_to_cd, by = "GEOID")
+c(tracts_assigned = nrow(tract_to_cd),
+  tracts_unassigned = nrow(unassigned),
+  residents_unassigned = sum(unassigned$race_total, na.rm = TRUE))
+```
+
+Only `r nrow(unassigned)` tracts are unassigned, and they have no residents (they are water tracts), so no population is lost.
+
+**Stage 2: add up counts.** Within each district, the tract *counts* are summed. **Stage 3: recompute shares.** Rates are calculated from the district totals. For example, the district rent-burden share is (all rent-burdened households in the district) ÷ (all renter households with a computed burden in the district). This is not the same as averaging tract percentages, which would give a small tract the same weight as a large one.
+
+```{r acs-to-cd}
+acs_cd <- acs %>%
+  inner_join(tract_to_cd, by = "GEOID") %>%
+  group_by(BoroCD) %>%
+  summarise(n_tracts    = n(),
+            pop         = sum(race_total, na.rm = TRUE),
+            renters     = sum(renter_households, na.rm = TRUE),
+            burden30    = sum(rent_burden_30plus, na.rm = TRUE),
+            burden_base = sum(rent_burden_total - rent_not_computed, na.rm = TRUE),
+            pov_below   = sum(poverty_below, na.rm = TRUE),
+            pov_total   = sum(poverty_total, na.rm = TRUE),
+            black       = sum(nh_black, na.rm = TRUE),
+            .groups = "drop") %>%
+  mutate(rent_burden  = burden30 / burden_base,   # share of renters paying >= 30% of income on rent
+         poverty_rate = pov_below / pov_total,
+         pct_black    = black / pop)
+
+# Check: no renter households are lost or double-counted in the aggregation
+c(renters_in_tracts = sum(acs$renter_households, na.rm = TRUE),
+  renters_in_districts = sum(acs_cd$renters))
+summary(acs_cd$n_tracts)
+```
+
+The citywide total of renter households is identical before and after aggregation, so each renter household is counted exactly once. Districts contain between `r min(acs_cd$n_tracts)` and `r max(acs_cd$n_tracts)` tracts. One limitation remains: where a tract is split between two districts, all of its households go to the larger side. Because tract and district boundaries mostly follow the same streets, this effect is small, but it is not zero.
+
+## 3.4 District table and eviction rates
+
+```{r cd-table}
+cd_counts <- ev_sf %>% st_drop_geometry() %>%
+  filter(in_window) %>%
+  count(BoroCD, name = "n20")
+
+cd_counts19 <- ev_sf %>% st_drop_geometry() %>%
+  filter(year == 2019) %>%
+  count(BoroCD, name = "n19")
+
+cdd <- cd %>%
+  left_join(acs_cd,      by = "BoroCD") %>%
+  left_join(cd_counts,   by = "BoroCD") %>%
+  left_join(cd_counts19, by = "BoroCD") %>%
+  mutate(across(c(n20, n19), ~ replace_na(.x, 0)),
+         rate20 = n20 / renters * 1000,   # per 1,000 renter households, 10-week window
+         rate19 = n19 / renters * 1000)   # per 1,000 renter households, full year 2019
+
+cdd %>% st_drop_geometry() %>%
+  select(n20, renters, rate20, rent_burden, poverty_rate, pct_black) %>%
+  summary()
+
+rho <- cor(cdd$rate20, cdd$rate19, method = "spearman")
+```
+
+District counts in the window range from `r min(cdd$n20)` to `r max(cdd$n20)`, so even the smallest district rate is based on several events. As a check on the ten-week window, the rank correlation between district rates in the 2020 window and in the whole of 2019 is **`r round(rho, 2)`**: the window reproduces almost exactly the district ranking of a full normal year.
+
+---
+
+# 4. Analysis
+
+## 4.1 Context: the 2020 policy break
+
+```{r weekly-graph, fig.height = 4.5}
+weekly <- ev %>%
+  filter(year %in% c(2019, 2020)) %>%
+  mutate(week = (yday(executed_date) - 1) %/% 7 + 1) %>%   # 7-day weeks from 1 January
+  filter(week <= 52) %>%
+  count(year, week) %>%
+  complete(year, week = 1:52, fill = list(n = 0))
+
+break_week <- (yday(as_date("2020-03-16")) - 1) %/% 7 + 1
+
+ggplot(weekly, aes(week, n, colour = factor(year))) +
+  geom_line(linewidth = 0.9) +
+  geom_vline(xintercept = break_week, linetype = "dashed") +
+  annotate("text", x = break_week + 1, y = max(weekly$n) * 0.95,
+           label = "16 Mar 2020: enforcement\nsuspended statewide", hjust = 0, size = 3.5) +
+  scale_colour_manual(values = c("2019" = "grey55", "2020" = "#B2182B"), name = NULL) +
+  labs(title = "Weekly marshal-executed residential evictions, NYC",
+       subtitle = "2020 followed a lower version of the 2019 pattern until the moratorium, then fell to almost zero",
+       x = "Week of year (7-day weeks from 1 January)", y = "Executed evictions") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+The graph supports the study window. Before mid-March 2020, evictions followed the same weekly rhythm as 2019 at a lower level. After that, the series was determined by policy. A month-by-month chart for the whole of 2020 would mostly show the moratorium, not the geography of housing need.
+
+## 4.2 Where are eviction rates high?
+
+```{r rate-map, fig.height = 7}
+boroughs <- cd_all %>%
+  mutate(boro = BoroCD %/% 100) %>%
+  group_by(boro) %>%
+  summarise(geometry = st_union(geometry))
+
+ggplot() +
+  geom_sf(data = cd_all %>% filter(jia), fill = "grey92", colour = NA) +
+  geom_sf(data = cdd, aes(fill = rate20), colour = "white", linewidth = 0.2) +
+  geom_sf(data = boroughs, fill = NA, colour = "grey20", linewidth = 0.5) +
+  scale_fill_viridis_c(option = "magma", direction = -1,
+                       name = "Evictions per\n1,000 renter\nhouseholds") +
+  labs(title = "Executed residential evictions, 1 Jan - 15 Mar 2020",
+       subtitle = "Rate per 1,000 renter households by community district (grey = JIAs, excluded)",
+       caption = "Sources: NYC DOI evictions (6z8x-wfk4); ACS 2015-19 renter households; DCP nycd 20D. EPSG:2263.") +
+  theme_void(base_size = 12) +
+  ggspatial::annotation_scale(location = "br", unit_category = "imperial") +
+  ggspatial::annotation_north_arrow(location = "tl", style = ggspatial::north_arrow_minimal())
+```
+
+```{r top-districts}
+# Neighbourhood names for the highest-rate districts (DCP community district profiles)
+cd_names <- c(`413` = "Queens 13: Queens Village, Laurelton, Rosedale",
+              `203` = "Bronx 3: Morrisania, Crotona Park East",
+              `212` = "Bronx 12: Wakefield, Williamsbridge, Eastchester",
+              `412` = "Queens 12: Jamaica, Hollis, St. Albans",
+              `317` = "Brooklyn 17: East Flatbush",
+              `205` = "Bronx 5: Fordham, University Heights",
+              `206` = "Bronx 6: Belmont, East Tremont",
+              `414` = "Queens 14: The Rockaways")
+
+cdd %>% st_drop_geometry() %>%
+  arrange(desc(rate20)) %>%
+  slice_head(n = 8) %>%
+  transmute(District = coalesce(cd_names[as.character(BoroCD)], as.character(BoroCD)),
+            Evictions = n20,
+            `Renter households` = comma(renters),
+            `Rate per 1,000` = round(rate20, 2),
+            `Rent burden` = percent(rent_burden, 1),
+            `Poverty rate` = percent(poverty_rate, 1)) %>%
+  knitr::kable(caption = "Highest eviction rates, 2020 window")
+```
+
+Rates differ by a factor of about `r round(max(cdd$rate20) / min(cdd$rate20))` between the highest and lowest districts. Two geographies stand out. The first is the **central and north Bronx**, where high poverty and high rent burden coincide. The second is **south-east Queens and East Flatbush**, where poverty rates are much lower but rent burdens are still high. Manhattan below Harlem has the lowest rates. This already suggests that poverty alone does not explain the pattern, a point tested in Section 4.4.
+
+## 4.3 Are high-rate districts spatially clustered?
+
+### Spatial weights
+
+```{r weights}
+nb_queen <- poly2nb(cdd, queen = TRUE)
+summary(card(nb_queen))
+n.comp.nb(nb_queen)$nc                 # number of disconnected sub-graphs
+cdd$BoroCD[card(nb_queen) == 0]        # district(s) with no contiguous neighbour
+
+centroids <- st_point_on_surface(st_geometry(cdd))
+nb_knn   <- knn2nb(knearneigh(centroids, k = 4))
+lw_knn   <- nb2listw(nb_knn, style = "W")
+lw_queen <- nb2listw(nb_queen, style = "W", zero.policy = TRUE)
+```
+
+Queen contiguity (districts are neighbours if they share a boundary) splits the city into four disconnected groups, because rivers separate Manhattan and Staten Island. It also leaves the Rockaways (Queens 14) with no neighbour at all, since Jamaica Bay lies between it and the rest of Queens. Rivers do not stop housing-market or social processes, so the main weights define each district's neighbours as its **4 nearest districts** (row-standardised, so each district's neighbours have equal weight summing to one). Queen results are shown for comparison.
+
+### Global Moran's I
+
+```{r global-moran}
+set.seed(2020)
+moran_knn   <- moran.mc(cdd$rate20, lw_knn, nsim = 999)
+moran_queen <- moran.mc(cdd$rate20, lw_queen, nsim = 999, zero.policy = TRUE)
+
+tibble(Weights = c("k = 4 nearest neighbours", "Queen contiguity"),
+       `Moran's I` = round(c(moran_knn$statistic, moran_queen$statistic), 3),
+       `Pseudo p (999 permutations)` = c(moran_knn$p.value, moran_queen$p.value)) %>%
+  knitr::kable()
+```
+
+Both versions show strong, significant positive spatial autocorrelation (I ≈ `r round(moran_knn$statistic, 2)`, permutation p = `r moran_knn$p.value`). Districts with high eviction rates tend to neighbour other high-rate districts, and the result does not depend on how neighbours are defined.
+
+### Local Moran's I (LISA)
+
+```{r lisa, fig.height = 7}
+set.seed(2020)   # seed set here so the result does not depend on earlier chunks
+lisa <- localmoran_perm(cdd$rate20, lw_knn, nsim = 9999)
+
+cdd <- cdd %>%
+  mutate(lisa_quad  = as.character(attr(lisa, "quadr")$mean),
+         lisa_p     = lisa[, "Pr(z != E(Ii)) Sim"],
+         lisa_padj  = p.adjust(lisa_p, method = "fdr"),
+         lisa_class = if_else(lisa_p < 0.05, lisa_quad, "Not significant"))
+
+table(cdd$lisa_class)
+c(significant_raw = sum(cdd$lisa_p < 0.05), significant_after_FDR = sum(cdd$lisa_padj < 0.05))
+fdr_core <- cdd %>% filter(lisa_padj < 0.05)
+
+ggplot() +
+  geom_sf(data = cd_all %>% filter(jia), fill = "grey92", colour = NA) +
+  geom_sf(data = cdd, aes(fill = lisa_class), colour = "white", linewidth = 0.2) +
+  geom_sf(data = boroughs, fill = NA, colour = "grey20", linewidth = 0.5) +
+  geom_sf(data = fdr_core, fill = NA, colour = "black", linewidth = 1.1) +
+  scale_fill_manual(values = c("High-High" = "#B2182B", "Low-Low" = "#2166AC",
+                               "Low-High" = "#92C5DE", "High-Low" = "#F4A582",
+                               "Not significant" = "grey85"), name = "LISA cluster") +
+  labs(title = "Local clusters of eviction rates, 2020 window",
+       subtitle = "Local Moran's I, kNN(4) weights, 9,999 permutations, unadjusted p < 0.05",
+       caption = "Thick black outline: still significant after false-discovery-rate (FDR) correction.") +
+  theme_void(base_size = 12) +
+  ggspatial::annotation_scale(location = "br", unit_category = "imperial") +
+  ggspatial::annotation_north_arrow(location = "tl", style = ggspatial::north_arrow_minimal())
+```
+
+At the unadjusted 5% level the local picture has two blocks: a **Bronx high-high cluster** covering most of the borough's districts, and a **Manhattan low-low cluster** from the Financial District to the Upper East Side, extending across the East River to Brooklyn 2. Manhattan 12 (Washington Heights and Inwood) and Bronx 8 (Riverdale) are low-high outliers on the edge of the Bronx cluster.
+
+Running 59 separate local tests makes some false positives likely, so the p-values are adjusted with the false-discovery-rate method. After adjustment `r nrow(fdr_core)` districts remain significant (`r paste0(fdr_core$BoroCD, " ", fdr_core$lisa_quad, collapse = ", ")`, outlined in black). The robust reading is therefore: the **global** clustering is strong; the core of the Manhattan low-low block, one central Bronx district and the Washington Heights/Inwood outlier survive correction; the full extent of both clusters is suggestive only.
+
+## 4.4 How are rates related to rent burden?
+
+### OLS regression
+
+The outcome is the **log** of the district eviction rate, because rates are right-skewed. On the log scale, a coefficient *b* means that a one-unit increase in the predictor multiplies the rate by about e^*b*. The model is built in two steps:
+
+- **Model 1:** rent burden alone, to see the raw association.
+- **Model 2:** rent burden with two controls: **poverty rate**, to check whether rent burden is simply standing in for low income; and **% non-Hispanic Black**, because racial composition is strongly patterned across the city and linked to housing-market disadvantage. This variable describes *districts*, not individuals.
+
+```{r ols}
+m1 <- lm(log(rate20) ~ rent_burden, data = cdd)
+m2 <- lm(log(rate20) ~ rent_burden + poverty_rate + pct_black, data = cdd)
+summary(m1)
+summary(m2)
+
+# Variance inflation factors: are the predictors too correlated with each other?
+X <- model.matrix(m2)[, -1]
+vif <- diag(solve(cor(X)))
+round(vif, 2)
+```
+
+```{r ols-numbers, include = FALSE}
+b_rb  <- coef(m2)["rent_burden"]
+eff10 <- exp(b_rb * 0.10) - 1   # effect of a 10 percentage-point higher rent burden
+```
+
+Rent burden alone explains `r percent(summary(m1)$r.squared, 1)` of the variation in log eviction rates. With the controls (Model 2, adjusted R² = `r percent(summary(m2)$adj.r.squared, 1)`), rent burden remains strongly significant: a district where 10 percentage points more renters are rent-burdened has an eviction rate about **`r percent(eff10, 1)` higher**, holding poverty and racial composition constant. The poverty rate has no independent association once rent burden is included, which suggests that the gap between rent and income matters more than income alone. % Black is also strongly and positively associated with rates. The largest variance inflation factor is `r round(max(vif), 2)` (values above about 5 would signal a problem), so the predictors are not too collinear to separate.
+
+### Are the residuals spatially independent?
+
+OLS assumes that each district's error is independent of its neighbours'. If the residuals are clustered, the model has missed something spatially patterned, and its standard errors (and therefore its p-values) are too optimistic.
+
+```{r residual-moran}
+lm.morantest(m2, lw_knn)
+
+# Lagrange multiplier tests: does the remaining dependence look like
+# an "error" process or a "lag" process?
+# (the function was renamed lm.RStests in recent spdep versions,
+# and the robust tests were renamed adjRSerr / adjRSlag)
+lm_res <- if (exists("lm.RStests")) {
+  lm.RStests(m2, lw_knn, test = c("adjRSerr", "adjRSlag"))   # spdep >= 1.3-2
+} else {
+  lm.LMtests(m2, lw_knn, test = c("RLMerr", "RLMlag"))       # older spdep
+}
+lm_res
+p_err <- lm_res[[1]]$p.value   # robust test for spatial error
+p_lag <- lm_res[[2]]$p.value   # robust test for spatial lag
+```
+
+The residuals are clearly clustered (Moran's I ≈ `r round(lm.morantest(m2, lw_knn)$estimate[1], 2)`, `r fmt_p(lm.morantest(m2, lw_knn)$p.value)`), so the OLS p-values cannot be fully trusted. The robust Lagrange multiplier tests ask what *kind* of dependence is left: the error version is significant at 5% (p = `r round(p_err, 3)`) and the lag version is not (p = `r round(p_lag, 3)`).
+
+### Spatial error model
+
+**What the model assumes, in plain terms.** A spatial lag model would say that evictions in one district *cause* evictions in neighbouring districts, which is implausible here. A **spatial error model** says instead that neighbouring districts share **unmeasured influences** that the predictors do not capture, for example the same borough Housing Court and its practices, overlapping landlord portfolios, or similar local housing markets. The model lets the error term of each district depend on its neighbours' errors (strength λ). This corrects the standard errors and checks whether the rent-burden association survives once that shared, unobserved background is accounted for.
+
+```{r sem}
+sem <- errorsarlm(log(rate20) ~ rent_burden + poverty_rate + pct_black,
+                  data = cdd, listw = lw_knn)
+summary(sem)
+
+coef_table <- tibble(
+  Term = names(coef(m2))[-1],
+  `OLS estimate` = round(coef(m2)[-1], 2),
+  `OLS p` = format.pval(summary(m2)$coefficients[-1, 4], digits = 2, eps = 0.001),
+  `Spatial error estimate` = round(coef(sem)[names(coef(m2))[-1]], 2),
+  `Spatial error p` = format.pval(summary(sem)$Coef[-1, 4], digits = 2, eps = 0.001))
+knitr::kable(coef_table, caption = "Model 2 estimated by OLS and as a spatial error model")
+
+set.seed(2020)
+sem_resid_p <- moran.mc(residuals(sem), lw_knn, nsim = 999)$p.value
+c(AIC_ols = AIC(m2), AIC_sem = AIC(sem), lambda = unname(sem$lambda),
+  residual_moran_p = sem_resid_p)
+```
+
+The spatial error model fits better (AIC `r round(AIC(sem), 1)` vs `r round(AIC(m2), 1)`), with a substantial λ of `r round(sem$lambda, 2)`, and its residuals no longer show significant clustering (p = `r sem_resid_p`). The rent-burden coefficient shrinks from `r round(coef(m2)["rent_burden"], 2)` to `r round(coef(sem)["rent_burden"], 2)`. Part of what OLS attributed to rent burden was in fact a shared regional background. But the association remains positive and significant: a 10-percentage-point higher rent burden now corresponds to an eviction rate about `r percent(exp(coef(sem)["rent_burden"] * 0.10) - 1, 1)` higher, a more conservative estimate than the OLS figure. Poverty remains unimportant, and the % Black association is unchanged.
+
+**The hypothesis is supported:** eviction rates are strongly clustered, and higher rent burden is associated with higher rates, even after accounting for poverty, racial composition and spatial dependence.
+
+---
+
+# 5. Interpretation
+
+| Question | Finding | Strength of evidence |
+|---|---|---|
+| Is the ten-week window representative? | District ranking matches full-year 2019 (ρ = `r round(rho, 2)`) | Strong |
+| How unequal are rates? | About `r round(max(cdd$rate20) / min(cdd$rate20))`-fold difference between highest and lowest district | Strong |
+| Are high rates clustered? | Global Moran's I ≈ `r round(moran_knn$statistic, 2)` under both weight definitions | Strong |
+| Where are the clusters? | Bronx high-high, Manhattan low-low | Core robust to FDR, edges suggestive |
+| Is rent burden associated with rates? | Yes, after controls and spatial error correction; poverty is not | Moderate (59 districts, ecological) |
+
+**What this means.** The geography of executed evictions in early 2020 was not a seasonal artefact. It was the city's normal geography, compressed into ten weeks. It has two parts. One is the Bronx, where low incomes and high rent burdens coincide. The other is a band of predominantly Black neighbourhoods from East Flatbush to south-east Queens, where incomes are higher but rent burdens are still high. The models cannot identify the mechanisms behind the racial association, but they show that targeting prevention by *poverty* alone would miss part of the problem: **rent burden is the more informative indicator**.
+
+**Implications for prevention:**
+
+1. **Target by rent burden, not poverty alone.** Districts such as Queens 13 (Queens Village to Rosedale) had among the highest eviction rates in the city despite moderate poverty.
+2. **Plan at the scale of borough-wide clusters.** Strong spatial dependence means neighbouring districts share risk. Resources such as legal aid, emergency rental assistance and outreach are better organised across clusters of districts than district by district.
+3. **Use community boards.** District rates and cluster status can be given to each community board as a local risk profile. That would turn the boards' formal role in land-use review into a role in monitoring displacement.
+
+---
+
+# 6. Critical reflection
+
+**What the data measure.** Marshal executions are the last stage of a long process. Filings, settlements, defaults, informal moves, landlord buyouts and harassment are all invisible. This is not just an undercount: the bias has a *spatial structure*. In fast-gentrifying neighbourhoods, displacement often happens before or outside court, through rent increases, non-renewal of leases and offers to leave. Low execution rates in Manhattan or north-west Brooklyn therefore do **not** mean low displacement. This is why I could not turn my interest in urban renewal into a direct test here. My own research on the regeneration of Nantou Ancient Town in Shenzhen suggests that most moves caused by renewal are "voluntary" in form and leave no court record. Executed evictions mostly capture an **affordability-and-precarity** process, which is related to renewal but not the same thing.
+
+**Temporal scope.** The proposed variation was necessary and, I think, defensible: `r percent(n20_window / n20_total, 0.1)` of 2020's evictions fall in the window, and the near-perfect rank correlation with 2019 shows that it represents the underlying pattern. But a winter-only window cannot show seasonality. The results describe pre-pandemic structure, not the much larger number of filings that built up behind the moratorium during 2020.
+
+**Spatial unit and inference.** Community districts are meaningful political units, but they are large (tens of thousands of renter households each). District-level associations cannot be transferred to individual households (the ecological fallacy), and different boundaries could change the results (MAUP). The % Black coefficient in particular describes *places*, not people, and should be read as evidence of a racially patterned housing geography, not as an individual risk factor. Fifty-nine units give limited statistical power. Only the core of the LISA clusters survives multiple-testing correction, and adding more variables would quickly overfit.
+
+**Denominators and data quality.** ACS values are five-year survey estimates with margins of error, and these are not carried into the models. Some small-count districts (Staten Island, lower Manhattan) have rates based on few events and are less stable. The largest-overlap rule assigns split tracts wholly to one district. `r n20_nocoord` records from 2020 (`r percent(n20_nocoord / n20_total, 0.1)`) could not be mapped because they lack coordinates. If those records are spatially uneven, district rates are biased slightly downwards where they occur.
+
+**Method choices.** The kNN(4) weights are a judgement. Queen weights give the same global result, but the local clusters and the λ of the error model depend on the choice. The spatial error model corrects for shared unobserved influences, but it does not say what they are.
+
+**Extensions that were scoped out.** Two further analyses were planned and set aside, so that this project could focus on what it can answer well:
+
+- *Legal representation:* Right to Counsel was rolled out ZIP code by ZIP code from 2017. A multi-year before-and-after comparison, using Housing Court filing data rather than executions, could test whether access to lawyers reduced evictions where it arrived.
+- *Housing stock and landlords:* linking evictions to building records (PLUTO, HPD violations, the HPD Speculation Watch List) would show whether evictions concentrate in particular building types and owners. A point-pattern test with a null model weighted by rental housing units could then show whether they cluster more than housing itself.
+
+**Overall**, the analysis answers the research question with reasonable confidence: early-2020 evictions followed a stable, strongly clustered district geography in which rent burden, not poverty as such, was associated with higher rates. It cannot answer the question that matters most for my interests, namely how much displacement urban renewal causes, because that displacement largely happens outside the court system that generated these data.
+
+---
+
+# References and data sources
+
+- NYC Department of Investigation, *Evictions*, NYC Open Data `6z8x-wfk4`: https://data.cityofnewyork.us/d/6z8x-wfk4
+- NYC Department of City Planning, *Community Districts* (nycd 20D): https://www.nyc.gov/site/planning/data-maps/open-data.page
+- U.S. Census Bureau, *ACS 2015–2019 5-year Summary File* and *TIGER/Line 2019 tracts*: https://www.census.gov/programs-surveys/acs/data/summary-file/sequence-based.2019.html
+- NYC Office of Civil Justice (2021). *NYC Office of Civil Justice 2020 Annual Report*. New York: NYC Human Resources Administration, Department of Social Services. https://a860-gpp.nyc.gov/concern/nyc_government_publications/hx11xh35g
+- Desmond, M. (2016). *Evicted: Poverty and Profit in the American City*. New York: Crown.
+- Anselin, L. (1995). Local indicators of spatial association — LISA. *Geographical Analysis*, 27(2), 93–115.
+- Bivand, R., Pebesma, E. and Gómez-Rubio, V. (2013). *Applied Spatial Data Analysis with R* (2nd ed.). Springer.
